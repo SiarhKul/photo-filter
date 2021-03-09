@@ -89,6 +89,17 @@ document.querySelector('input[type="file"]').addEventListener('change', (e) => {
   console.dir(reader);
 })
 
+// --------------------------------------SAVE IMG
+
+document.querySelector('.btn-save').addEventListener('click', () => {
+  // image.attr({
+  //   target: '_blank',
+  //   href: 'http://localhost/directory/file.pdf'
+  // });
+  document.downloads.download({ url: image.src })
+  console.log(image.src);
+})
+
 // --------------------------------------FUNCTION
 
 function getLinkImg() {
