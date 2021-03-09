@@ -70,8 +70,24 @@ btnNext.addEventListener('click', () => {
   btnNext.disabled = true;
   setTimeout(function () { btnNext.disabled = false }, 1000);
 });
+
 // --------------------------------------LOAD FILE
 
+document.querySelector('input[type="file"]').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+
+  reader.onload = () => {
+    image.src = reader.result;
+  }
+  reader.onerror = () => {
+    console.log(reader.error);
+  };
+  console.log(file);
+  console.dir(e.target);
+  console.dir(reader);
+})
 
 // --------------------------------------FUNCTION
 
