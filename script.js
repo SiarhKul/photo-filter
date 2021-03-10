@@ -6,7 +6,6 @@ const setProps = document.documentElement.style
 const image = document.querySelector('.image');
 const btnNext = document.querySelector('.btn-next');
 
-
 document.querySelector('.fullscreen').addEventListener('click', () => {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen();
@@ -20,19 +19,21 @@ document.querySelector('.fullscreen').addEventListener('click', () => {
 
 document.addEventListener('keydown', turnOffFullscreen)
 
-document.querySelector('.filters').addEventListener('input', (e) => {
-  const suffixCssProps = e.target.dataset.sizing || '';
-  const nameCssProps = e.target.name
-  const valueCssProps = e.target.value
-  const outputValue = e.target.nextElementSibling
-  document.documentElement.style.setProperty(`--${nameCssProps}`, valueCssProps + suffixCssProps)
-  outputValue.value = valueCssProps
-})
+// document.querySelector('.filters').addEventListener('input', (e) => {
+//   const suffixCssProps = e.target.dataset.sizing || '';
+//   const nameCssProps = e.target.name
+//   const valueCssProps = e.target.value
+//   const outputValue = e.target.nextElementSibling
+//   document.documentElement.style.setProperty(`--${nameCssProps}`, valueCssProps + suffixCssProps)
+//   outputValue.value = valueCssProps
+// })
 
 document.querySelector('.btn-reset').addEventListener('click', () => {
+
   inputs.forEach(input => {
     setProps.setProperty(`--${input.name}`, input.value + input.sizing)
-    console.log(input.name === 'saturate')
+
+    // ctx.filter = `${input.name}(${input.value}${input.sizing})`;
 
     input.name === 'saturate'
       ? input.value = 100
@@ -41,6 +42,7 @@ document.querySelector('.btn-reset').addEventListener('click', () => {
       ? input.nextElementSibling.value = 100
       : input.nextElementSibling.value = 0
   })
+
 })
 
 document.querySelector('.editor').addEventListener('click', ({ target: { parentElement, tagName, classList } }) => {
@@ -55,52 +57,111 @@ document.querySelector('.editor').addEventListener('click', ({ target: { parentE
   };
 })
 
+// --------------------------------------NEXT IMG___GOOD
 
-// --------------------------------------NEXT IMG
+// btnNext.addEventListener('click', () => {
+//   const index = i % images.length;
+//   const imageSrc = getLinkImg() + images[index];
+//   image.src = imageSrc;
+//   image.onload = () => {
+//     image.src = imageSrc;
+//   };
 
-btnNext.addEventListener('click', () => {
-  const index = i % images.length;
-  const imageSrc = getLinkImg() + images[index];
-  image.src = imageSrc;
-  image.onload = () => {
-    image.src = imageSrc;
-  };
-
-  i++;
-  btnNext.disabled = true;
-  setTimeout(function () { btnNext.disabled = false }, 1000);
-});
+//   i++;
+//   btnNext.disabled = true;
+//   setTimeout(function () { btnNext.disabled = false }, 1000);
+// });
 
 // --------------------------------------LOAD FILE
 
 document.querySelector('input[type="file"]').addEventListener('change', (e) => {
   const file = e.target.files[0];
   const reader = new FileReader();
-  reader.readAsDataURL(file);
+  reader.readAsDataURL(file)
 
   reader.onload = () => {
     image.src = reader.result;
   }
+
   reader.onerror = () => {
     console.log(reader.error);
   };
-  console.log(file);
-  console.dir(e.target);
-  console.dir(reader);
 })
 
 // --------------------------------------SAVE IMG
+const canvas = document.querySelector('canvas');
+const ctx = canvas.getContext('2d');
 
-document.querySelector('.btn-save').addEventListener('click', () => {
-  // image.attr({
-  //   target: '_blank',
-  //   href: 'http://localhost/directory/file.pdf'
-  // });
-  document.downloads.download({ url: image.src })
-  console.log(image.src);
+document.querySelector('.btn-save').addEventListener('click', (e) => {
+  //только по с внутреннего ресурса
+  // var link = document.createElement('a');
+  // link.download = 'download.png';
+  // link.href = image.src;
+  // link.click();
+  // link.delete;
+
+  console.log(canvas.toDataURL());
+  var link = document.createElement('a');
+  link.download = 'download.png';
+  link.href = canvas.toDataURL();
+  link.click();
+  link.delete;
 })
 
-// --------------------------------------FUNCTION
+
+// --------------------------------------FILTERS___NO
+document.querySelector('.filters').addEventListener('input', (e) => {
+  const suffixCssProps = e.target.dataset.sizing || '';
+  const nameCssProps = e.target.name
+  const valueCssProps = e.target.value
+  const outputValue = e.target.nextElementSibling
+  outputValue.value = valueCssProps
+
+  // ctx.filter = `contrast(1.4) sepia(1) drop-shadow(-9px 9px 3px #e81)`;
+
+  console.log(`${nameCssProps}(${valueCssProps}${suffixCssProps})`);
+
+  ctx.filter = `${nameCssProps}(${valueCssProps}${suffixCssProps})`;
+
+  ctx.drawImage(image, 0, 0);
+  console.log(suffixCssProps);
+  console.log(nameCssProps);
+  console.log(valueCssProps);
+  console.log(outputValue);
+
+
+})
+// --------------------------------------NEXT IMG___NO
+
+// const canvas = document.querySelector('canvas');
+btnNext.addEventListener('click', drawImage);
+
+function drawImage() {
+  const index = i % images.length;
+  const imageSrc = getLinkImg() + images[index];
+  const ctx = canvas.getContext("2d");
+  // const img = new Image();
+  image.setAttribute('crossOrigin', 'anonymous');
+  image.src = imageSrc
+  image.onload = function () {
+    canvas.width = image.width;
+    canvas.height = image.height;
+    ctx.drawImage(image, 0, 0);
+  };
+  i++;
+}
+drawImage();
+
+
+
+
+
+
+
+
+
+
+//! --------------------------------------FUNCTION
 
 function getLinkImg() {
   const linkFragment = 'https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/';
