@@ -103,7 +103,7 @@ function drawImage() {
   const index = i % images.length;
   const imageSrc = getLinkImg() + images[index];
   const ctx = canvas.getContext("2d");
-  // const img = new Image();
+  const image = new Image();
   image.setAttribute('crossOrigin', 'anonymous');
   image.src = imageSrc
   image.onload = function () {
