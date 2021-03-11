@@ -3,12 +3,33 @@ const images = ['01.jpg', '02.jpg', '03.jpg', '04.jpg', '05.jpg', '06.jpg', '07.
 const btns = document.querySelectorAll('.btn')
 const inputs = document.querySelectorAll('.filters input')
 const setProps = document.documentElement.style
-const image = document.querySelector('.image');
+const image = new Image();
 const btnNext = document.querySelector('.btn-next');
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 
-document.querySelector('.fullscreen').addEventListener('click', () => {
+//! --------------------------------------addEventListener
+window.addEventListener('load', loadPicture)
+
+document.querySelector('.fullscreen').addEventListener('click', setFullScreen)
+
+document.addEventListener('keydown', turnOffFullscreen)
+
+btnNext.addEventListener('click', loadPicture);
+
+document.querySelector('.btn-reset').addEventListener('click', resetFilters)
+
+document.querySelector('.editor').addEventListener('click', changeBackgroundBtn)
+
+document.querySelector('input[type="file"]').addEventListener('change', downloadPicture)
+
+document.querySelector('.btn-save').addEventListener('click', savePicture)
+
+document.querySelector('.filters').addEventListener('input', setFilter)
+
+//! --------------------------------------function
+
+function setFullScreen() {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen();
   } else {
@@ -17,14 +38,14 @@ document.querySelector('.fullscreen').addEventListener('click', () => {
       turnOffFullscreen()
     }
   }
-})
+}
 
-document.addEventListener('keydown', turnOffFullscreen)
-
-document.querySelector('.btn-reset').addEventListener('click', () => {
+function resetFilters() {
   inputs.forEach(input => {
+
     ctx.filter = `${input.name}(${input.value = 0}${input.dataset.sizing})`;
     ctx.drawImage(image, 0, 0);
+
     input.name === 'saturate'
       ? input.value = 100
       : input.value = 0
@@ -32,9 +53,9 @@ document.querySelector('.btn-reset').addEventListener('click', () => {
       ? input.nextElementSibling.value = 100
       : input.nextElementSibling.value = 0
   })
-})
+}
 
-document.querySelector('.editor').addEventListener('click', ({ target: { parentElement, tagName, classList } }) => {
+function changeBackgroundBtn({ target: { parentElement, tagName, classList } }) {
   if (tagName === 'BUTTON') {
     btns.forEach(b => { b.classList.remove('btn-active') })
     classList.add('btn-active')
@@ -44,46 +65,29 @@ document.querySelector('.editor').addEventListener('click', ({ target: { parentE
     btns.forEach(b => { b.classList.remove('btn-active') })
     parentElement.classList.add('btn-active');
   };
-})
+}
 
-// --------------------------------------LOAD FILE
-
-document.querySelector('input[type="file"]').addEventListener('change', (e) => {
+function downloadPicture(e) {
   const file = e.target.files[0];
   const reader = new FileReader();
   reader.readAsDataURL(file)
-
   reader.onload = () => {
     image.src = reader.result;
   }
-
   reader.onerror = () => {
     console.log(reader.error);
   };
-})
+}
 
-// --------------------------------------SAVE IMG
-
-
-document.querySelector('.btn-save').addEventListener('click', (e) => {
-  //только по с внутреннего ресурса
-  // var link = document.createElement('a');
-  // link.download = 'download.png';
-  // link.href = image.src;
-  // link.click();
-  // link.delete;
-
-  console.log(canvas.toDataURL());
-  var link = document.createElement('a');
+function savePicture(e) {
+  let link = document.createElement('a');
   link.download = 'download.png';
   link.href = canvas.toDataURL();
   link.click();
   link.delete;
-})
+};
 
-
-// --------------------------------------FILTERS___NO
-document.querySelector('.filters').addEventListener('input', (e) => {
+function setFilter(e) {
   const suffixCssProps = e.target.dataset.sizing || '';
   const nameCssProps = e.target.name
   const valueCssProps = e.target.value
@@ -91,31 +95,10 @@ document.querySelector('.filters').addEventListener('input', (e) => {
   outputValue.value = valueCssProps
 
   ctx.filter = `${nameCssProps}(${valueCssProps}${suffixCssProps})`;
+  console.log(`${nameCssProps}(${valueCssProps}${suffixCssProps})`)
   ctx.drawImage(image, 0, 0);
 
-})
-// --------------------------------------NEXT IMG___NO
-
-btnNext.addEventListener('click', drawImage);
-
-
-function drawImage() {
-  const index = i % images.length;
-  const imageSrc = getLinkImg() + images[index];
-  const ctx = canvas.getContext("2d");
-  const image = new Image();
-  image.setAttribute('crossOrigin', 'anonymous');
-  image.src = imageSrc
-  image.onload = function () {
-    canvas.width = image.width;
-    canvas.height = image.height;
-    ctx.drawImage(image, 0, 0);
-  };
-  i++;
 }
-drawImage();
-
-//! --------------------------------------FUNCTION
 
 function getLinkImg() {
   const linkFragment = 'https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/';
@@ -133,6 +116,21 @@ function turnOffFullscreen(e) {
       toggleFullScreen();
     }
   }, false);
+}
+
+function loadPicture() {
+  const index = i % images.length;
+  const imageSrc = getLinkImg() + images[index];
+  const ctx = canvas.getContext("2d");
+
+  image.setAttribute('crossOrigin', 'anonymous');
+  image.src = imageSrc
+  image.onload = function () {
+    canvas.width = image.width;
+    canvas.height = image.height;
+    ctx.drawImage(image, 0, 0);
+  };
+  i++;
 }
 
 
